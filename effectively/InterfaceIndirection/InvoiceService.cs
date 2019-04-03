@@ -2,15 +2,33 @@
     using System.Net;
     using System.Web;
 
-    public class InvoiceService {
+    public class InvoiceService
+    {
+        ISetResponseCode responseCodeSetter;
 
-        public InvoiceDto GetInvoice(int id) {
+        public InvoiceService(ISetResponseCode responseCode)
+        {
+            this.responseCodeSetter = responseCode;
+        }
 
-            // arg! how can I test that this happened?
-            HttpContext.Current.Response.StatusCode = (int)HttpStatusCode.OK;
+        public InvoiceDto GetInvoice(int id)
+        {
+            this.responseCodeSetter.SetStatusCode((int)HttpStatusCode.OK);
 
             return new InvoiceDto { Id = id };
         }
+    }
 
+    public interface ISetResponseCode
+    {
+        void SetStatusCode(int statusCode);
+    }
+
+    public class HttpResponseCode : ISetResponseCode
+    {
+        public void SetStatusCode(int statusCode)
+        {
+            HttpContext.Current.Response.StatusCode = statusCode;
+        }
     }
 }
